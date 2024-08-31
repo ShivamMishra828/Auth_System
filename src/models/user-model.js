@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
     {
@@ -18,6 +19,7 @@ const userSchema = new mongoose.Schema(
         },
         lastLogin: {
             type: Date,
+            default: null,
         },
         isVerified: {
             type: Boolean,
@@ -30,6 +32,17 @@ const userSchema = new mongoose.Schema(
     },
     { timestamps: true }
 );
+
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+
+    this.password = bcrypt.hashSync(this.password, 10);
+    next();
+});
+
+userSchema.methods.checkPassword = async function (password) {
+    return bcrypt.compareSync(password, this.password);
+};
 
 const User = mongoose.model("User", userSchema);
 

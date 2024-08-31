@@ -3,6 +3,7 @@ const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const { rateLimit } = require("express-rate-limit");
 const { LoggerConfig } = require("./config");
+const apiRoutes = require("./routes");
 
 const app = express();
 const limiter = rateLimit({
@@ -25,6 +26,7 @@ app.use(
     })
 );
 
+app.use("/api", apiRoutes);
 app.get("/", (req, res) => {
     res.send("Server is Up and Running Smoothly!");
 });
