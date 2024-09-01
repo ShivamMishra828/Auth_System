@@ -36,7 +36,30 @@ async function verifyEmail(req, res) {
     }
 }
 
+async function signin(req, res) {
+    try {
+        const { user, jwtToken } = await AuthService.signin({
+            email: req.body.email,
+            password: req.body.password,
+        });
+
+        return res
+            .status(StatusCodes.OK)
+            .json(
+                new SuccessResponse(
+                    { user, token: jwtToken },
+                    "User logged in successfully"
+                )
+            );
+    } catch (error) {
+        return res
+            .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+            .json(new ErrorResponse(error));
+    }
+}
+
 module.exports = {
     signup,
     verifyEmail,
+    signin,
 };

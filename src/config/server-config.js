@@ -9,4 +9,5 @@ module.exports = {
     MAIL_PORT: process.env.MAIL_PORT,
     MAIL_USER: process.env.MAIL_USER,
     MAIL_PASS: process.env.MAIL_PASS,
+    JWT_SECRET: process.env.JWT_SECRET,
 };

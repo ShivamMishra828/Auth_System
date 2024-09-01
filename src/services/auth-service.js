@@ -3,7 +3,7 @@ const { UserRepository } = require("../repository");
 const AppError = require("../utils/error/app-error");
 const { GenerateVerificationCode } = require("../utils/common");
 const { MailTemplates } = require("../templates");
-const { MailSender } = require("../utils/common");
+const { MailSender, JWTToken } = require("../utils/common");
 
 const userRepository = new UserRepository();
 
@@ -58,6 +58,13 @@ async function verifyEmail(data) {
             throw new AppError("User not found", StatusCodes.NOT_FOUND);
         }
 
+        if (user.isVerified === true) {
+            throw new AppError(
+                "User is already verified",
+                StatusCodes.BAD_REQUEST
+            );
+        }
+
         if (otp != user.verificationToken) {
             throw new AppError("Invalid otp", StatusCodes.BAD_REQUEST);
         }
@@ -93,7 +100,43 @@ async function verifyEmail(data) {
     }
 }
 
+async function signin(data) {
+    try {
+        const { email, password } = data;
+
+        const user = await userRepository.findOne({ email });
+        if (!user) {
+            throw new AppError(
+                "User not exists, signup first",
+                StatusCodes.NOT_FOUND
+            );
+        }
+
+        const isPasswordCorrect = await user.checkPassword(password);
+        if (!isPasswordCorrect) {
+            throw new AppError("Invalid Credentials", StatusCodes.BAD_REQUEST);
+        }
+
+        const payload = {
+            userId: user._id,
+            email,
+        };
+        const jwtToken = await JWTToken.generateJWTToken(payload);
+
+        user.lastLogin = Date.now();
+        await user.save();
+
+        return { user, jwtToken };
+    } catch (error) {
+        throw new AppError(
+            "Something went wrong while logging in the user",
+            StatusCodes.INTERNAL_SERVER_ERROR
+        );
+    }
+}
+
 module.exports = {
     signup,
     verifyEmail,
+    signin,
 };
