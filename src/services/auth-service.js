@@ -49,6 +49,51 @@ async function signup(data) {
     }
 }
 
+async function verifyEmail(data) {
+    try {
+        const { email, otp } = data;
+
+        const user = await userRepository.findOne({ email });
+        if (!user) {
+            throw new AppError("User not found", StatusCodes.NOT_FOUND);
+        }
+
+        if (otp != user.verificationToken) {
+            throw new AppError("Invalid otp", StatusCodes.BAD_REQUEST);
+        }
+
+        if (user.verificationTokenExpiresAt <= Date.now()) {
+            throw new AppError("Otp expires", StatusCodes.BAD_REQUEST);
+        }
+
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        user.verificationTokenExpiresAt = undefined;
+        await user.save();
+
+        const response = await MailSender.sendMail({
+            receiverInfo: email,
+            subject:
+                "Welcome Aboard! Your Account Has Been Successfully Created",
+            body: MailTemplates.verificationSuccessTemplate(),
+        });
+        if (!response) {
+            throw new AppError(
+                "Can't send verification mail",
+                StatusCodes.BAD_REQUEST
+            );
+        }
+
+        return user;
+    } catch (error) {
+        throw new AppError(
+            "Something went wrong while verifying user's email",
+            StatusCodes.INTERNAL_SERVER_ERROR
+        );
+    }
+}
+
 module.exports = {
     signup,
+    verifyEmail,
 };

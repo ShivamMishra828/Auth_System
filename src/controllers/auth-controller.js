@@ -20,6 +20,23 @@ async function signup(req, res) {
     }
 }
 
+async function verifyEmail(req, res) {
+    try {
+        const user = await AuthService.verifyEmail({
+            email: req.body.email,
+            otp: req.body.otp,
+        });
+        return res
+            .status(StatusCodes.OK)
+            .json(new SuccessResponse(user, "User Verified Successfully"));
+    } catch (error) {
+        return res
+            .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+            .json(new ErrorResponse(error));
+    }
+}
+
 module.exports = {
     signup,
+    verifyEmail,
 };
