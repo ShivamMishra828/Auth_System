@@ -44,6 +44,12 @@ async function signin(req, res) {
         });
 
         return res
+            .cookie("token", jwtToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === "production",
+                sameSite: "strict",
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+            })
             .status(StatusCodes.OK)
             .json(
                 new SuccessResponse(
@@ -58,8 +64,27 @@ async function signin(req, res) {
     }
 }
 
+async function logout(req, res) {
+    try {
+        return res
+            .clearCookie("token")
+            .status(StatusCodes.OK)
+            .json(new SuccessResponse({}, "User logged out successfully"));
+    } catch (error) {
+        return res
+            .status(StatusCodes.INTERNAL_SERVER_ERROR)
+            .json(
+                new ErrorResponse(
+                    error,
+                    "Something went wrong while logging out the user"
+                )
+            );
+    }
+}
+
 module.exports = {
     signup,
     verifyEmail,
     signin,
+    logout,
 };
