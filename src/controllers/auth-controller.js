@@ -103,10 +103,29 @@ async function forgotPassword(req, res) {
     }
 }
 
+async function resetPassword(req, res) {
+    try {
+        await AuthService.resetPassword({
+            newPassword: req.body.newPassword,
+            confirmNewPassword: req.body.confirmNewPassword,
+            resetToken: req.params.resetToken,
+        });
+
+        return res
+            .status(StatusCodes.OK)
+            .json(new SuccessResponse({}, "Password Reset Successfully"));
+    } catch (error) {
+        return res
+            .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+            .json(new ErrorResponse(error));
+    }
+}
+
 module.exports = {
     signup,
     verifyEmail,
     signin,
     logout,
     forgotPassword,
+    resetPassword,
 };

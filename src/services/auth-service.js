@@ -171,10 +171,60 @@ async function forgotPassword(data) {
     }
 }
 
+async function resetPassword(data) {
+    try {
+        const { newPassword, confirmNewPassword, resetToken } = data;
+        console.log(newPassword, confirmNewPassword);
+
+        if (newPassword !== confirmNewPassword) {
+            throw new AppError(
+                "New Password and Confirm new password must be same",
+                StatusCodes.BAD_REQUEST
+            );
+        }
+
+        const user = await userRepository.findOne({
+            resetPasswordToken: resetToken,
+            resetPasswordExpiresAt: {
+                $gt: Date.now(),
+            },
+        });
+        if (!user) {
+            throw new AppError(
+                "Invalid or expired reset token",
+                StatusCodes.BAD_REQUEST
+            );
+        }
+
+        user.password = newPassword;
+        user.resetPasswordToken = undefined;
+        user.resetPasswordExpiresAt = undefined;
+        await user.save();
+
+        const response = await MailSender.sendMail({
+            receiverInfo: user.email,
+            subject: "Password Reset Successfully",
+            body: MailTemplates.resetPasswordSuccessTemplate(),
+        });
+        if (!response) {
+            throw new AppError(
+                "Can't send reset password success mail",
+                StatusCodes.BAD_REQUEST
+            );
+        }
+    } catch (error) {
+        throw new AppError(
+            "Something went wrong while resetting user password",
+            StatusCodes.INTERNAL_SERVER_ERROR
+        );
+    }
+}
+
 module.exports = {
     signup,
     verifyEmail,
     signin,
     verifyEmail,
     forgotPassword,
+    resetPassword,
 };
