@@ -220,6 +220,26 @@ async function resetPassword(data) {
     }
 }
 
+async function fetchUserByJWTToken(data) {
+    try {
+        const { email } = data;
+        const user = await userRepository.findOne({ email });
+        if (!user) {
+            throw new AppError(
+                "User corresponding to token doesn't exist.",
+                StatusCodes.NOT_FOUND
+            );
+        }
+
+        return user._id;
+    } catch (error) {
+        throw new AppError(
+            "An unexpected error occurred while verifying the token.",
+            StatusCodes.INTERNAL_SERVER_ERROR
+        );
+    }
+}
+
 module.exports = {
     signup,
     verifyEmail,
@@ -227,4 +247,5 @@ module.exports = {
     verifyEmail,
     forgotPassword,
     resetPassword,
+    fetchUserByJWTToken,
 };
