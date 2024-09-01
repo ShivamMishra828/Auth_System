@@ -82,9 +82,31 @@ async function logout(req, res) {
     }
 }
 
+async function forgotPassword(req, res) {
+    try {
+        await AuthService.forgotPassword({
+            email: req.body.email,
+        });
+
+        return res
+            .status(StatusCodes.OK)
+            .json(
+                new SuccessResponse(
+                    {},
+                    "Reset Password link has been sent to your email"
+                )
+            );
+    } catch (error) {
+        return res
+            .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+            .json(new ErrorResponse(error));
+    }
+}
+
 module.exports = {
     signup,
     verifyEmail,
     signin,
     logout,
+    forgotPassword,
 };

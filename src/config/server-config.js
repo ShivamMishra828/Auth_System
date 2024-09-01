@@ -10,4 +10,5 @@ module.exports = {
     MAIL_USER: process.env.MAIL_USER,
     MAIL_PASS: process.env.MAIL_PASS,
     JWT_SECRET: process.env.JWT_SECRET,
+    CLIENT_URL: process.env.CLIENT_URL,
 };

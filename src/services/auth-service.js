@@ -4,6 +4,8 @@ const AppError = require("../utils/error/app-error");
 const { GenerateVerificationCode } = require("../utils/common");
 const { MailTemplates } = require("../templates");
 const { MailSender, JWTToken } = require("../utils/common");
+const uuid = require("uuid").v4;
+const { ServerConfig } = require("../config");
 
 const userRepository = new UserRepository();
 
@@ -86,7 +88,7 @@ async function verifyEmail(data) {
         });
         if (!response) {
             throw new AppError(
-                "Can't send verification mail",
+                "Can't send welcome mail",
                 StatusCodes.BAD_REQUEST
             );
         }
@@ -135,8 +137,44 @@ async function signin(data) {
     }
 }
 
+async function forgotPassword(data) {
+    try {
+        const { email } = data;
+        const user = await userRepository.findOne({ email });
+        if (!user) {
+            throw new AppError("User not found", StatusCodes.NOT_FOUND);
+        }
+
+        const resetToken = uuid();
+        const resetURL = `${ServerConfig.CLIENT_URL}/reset-password/${resetToken}`;
+
+        user.resetPasswordToken = resetToken;
+        user.resetPasswordExpiresAt = Date.now() + 10 * 60 * 1000;
+        await user.save();
+
+        const response = await MailSender.sendMail({
+            receiverInfo: email,
+            subject: "Reset Your Password",
+            body: MailTemplates.resetPasswordTemplate(resetURL),
+        });
+        if (!response) {
+            throw new AppError(
+                "Can't send reset password mail",
+                StatusCodes.BAD_REQUEST
+            );
+        }
+    } catch (error) {
+        throw new AppError(
+            "Something went wrong while forgotting the password",
+            StatusCodes.INTERNAL_SERVER_ERROR
+        );
+    }
+}
+
 module.exports = {
     signup,
     verifyEmail,
     signin,
+    verifyEmail,
+    forgotPassword,
 };
