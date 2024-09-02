@@ -1,15 +1,38 @@
 const express = require("express");
 const { AuthController } = require("../../controllers");
-const { AuthMiddleware } = require("../../middlewares");
+const {
+    AuthMiddleware,
+    ValidateIncomingRequest,
+} = require("../../middlewares");
 
 const router = express.Router();
 
-router.post("/signup", AuthController.signup);
-router.post("/verify-email", AuthController.verifyEmail);
-router.post("/signin", AuthController.signin);
-router.get("/logout", AuthController.logout);
-router.post("/forgot-password", AuthController.forgotPassword);
-router.post("/reset-password/:resetToken", AuthController.resetPassword);
+router.post(
+    "/signup",
+    ValidateIncomingRequest.validateIncomingSignUpRequest,
+    AuthController.signup
+);
+router.post(
+    "/verify-email",
+    ValidateIncomingRequest.validateIncomingVerifyEmailRequest,
+    AuthController.verifyEmail
+);
+router.post(
+    "/signin",
+    ValidateIncomingRequest.validateIncomingSignInRequest,
+    AuthController.signin
+);
+router.get("/logout", AuthMiddleware.verifyJWT, AuthController.logout);
+router.post(
+    "/forgot-password",
+    ValidateIncomingRequest.validateIncomingForgotPasswordRequest,
+    AuthController.forgotPassword
+);
+router.post(
+    "/reset-password/:resetToken",
+    ValidateIncomingRequest.validateIncomingResetPasswordRequest,
+    AuthController.resetPassword
+);
 router.get("/verify", AuthMiddleware.verifyJWT, (req, res) => {
     res.send({ message: "User Verified" });
 });

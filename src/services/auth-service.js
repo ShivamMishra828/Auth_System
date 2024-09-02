@@ -43,7 +43,10 @@ async function signup(data) {
 
         return user;
     } catch (error) {
-        console.log(error);
+        if (error.statusCode === StatusCodes.BAD_REQUEST) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
         throw new AppError(
             "Something went wrong while signing up the user",
             StatusCodes.INTERNAL_SERVER_ERROR
@@ -95,6 +98,14 @@ async function verifyEmail(data) {
 
         return user;
     } catch (error) {
+        if (error.statusCode === StatusCodes.BAD_REQUEST) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
+        if (error.statusCode === StatusCodes.NOT_FOUND) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
         throw new AppError(
             "Something went wrong while verifying user's email",
             StatusCodes.INTERNAL_SERVER_ERROR
@@ -130,6 +141,14 @@ async function signin(data) {
 
         return { user, jwtToken };
     } catch (error) {
+        if (error.statusCode === StatusCodes.BAD_REQUEST) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
+        if (error.statusCode === StatusCodes.NOT_FOUND) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
         throw new AppError(
             "Something went wrong while logging in the user",
             StatusCodes.INTERNAL_SERVER_ERROR
@@ -164,6 +183,14 @@ async function forgotPassword(data) {
             );
         }
     } catch (error) {
+        if (error.statusCode === StatusCodes.BAD_REQUEST) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
+        if (error.statusCode === StatusCodes.NOT_FOUND) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
         throw new AppError(
             "Something went wrong while forgotting the password",
             StatusCodes.INTERNAL_SERVER_ERROR
@@ -213,6 +240,10 @@ async function resetPassword(data) {
             );
         }
     } catch (error) {
+        if (error.statusCode === StatusCodes.BAD_REQUEST) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
         throw new AppError(
             "Something went wrong while resetting user password",
             StatusCodes.INTERNAL_SERVER_ERROR
@@ -233,6 +264,10 @@ async function fetchUserByJWTToken(data) {
 
         return user._id;
     } catch (error) {
+        if (error.statusCode === StatusCodes.NOT_FOUND) {
+            throw new AppError(error.explanation, error.statusCode);
+        }
+
         throw new AppError(
             "An unexpected error occurred while verifying the token.",
             StatusCodes.INTERNAL_SERVER_ERROR
