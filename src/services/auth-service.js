@@ -131,8 +131,7 @@ async function signin(data) {
         }
 
         const payload = {
-            userId: user._id,
-            email,
+            id: user._id,
         };
         const jwtToken = await JWTToken.generateJWTToken(payload);
 
@@ -251,25 +250,26 @@ async function resetPassword(data) {
     }
 }
 
-async function fetchUserByJWTToken(data) {
+async function fetchUserDetails(data) {
     try {
-        const { email } = data;
-        const user = await userRepository.findOne({ email });
-        if (!user) {
+        const { userId } = data;
+        const userDetails = await userRepository.findById(userId);
+
+        if (!userDetails) {
             throw new AppError(
-                "User corresponding to token doesn't exist.",
-                StatusCodes.NOT_FOUND
+                "User with given userId doesn't exists",
+                StatusCodes.BAD_REQUEST
             );
         }
 
-        return user._id;
+        return userDetails;
     } catch (error) {
-        if (error.statusCode === StatusCodes.NOT_FOUND) {
+        if (error.statusCode === StatusCodes.BAD_REQUEST) {
             throw new AppError(error.explanation, error.statusCode);
         }
 
         throw new AppError(
-            "An unexpected error occurred while verifying the token.",
+            "Something went wrong while fetching user's details",
             StatusCodes.INTERNAL_SERVER_ERROR
         );
     }
@@ -282,5 +282,5 @@ module.exports = {
     verifyEmail,
     forgotPassword,
     resetPassword,
-    fetchUserByJWTToken,
+    fetchUserDetails,
 };

@@ -33,8 +33,5 @@ router.post(
     ValidateIncomingRequest.validateIncomingResetPasswordRequest,
     AuthController.resetPassword
 );
-router.get("/verify", AuthMiddleware.verifyJWT, (req, res) => {
-    res.send({ message: "User Verified" });
-});
 
 module.exports = router;

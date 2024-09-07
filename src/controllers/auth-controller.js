@@ -121,6 +121,27 @@ async function resetPassword(req, res) {
     }
 }
 
+async function fetchUserDetails(req, res) {
+    try {
+        const userDetails = await AuthService.fetchUserDetails({
+            userId: req.userId,
+        });
+
+        return res
+            .status(StatusCodes.OK)
+            .json(
+                new SuccessResponse(
+                    userDetails,
+                    "Successfully fetched user details"
+                )
+            );
+    } catch (error) {
+        return res
+            .status(error.statusCode || StatusCodes.INTERNAL_SERVER_ERROR)
+            .json(new ErrorResponse(error));
+    }
+}
+
 module.exports = {
     signup,
     verifyEmail,
@@ -128,4 +149,5 @@ module.exports = {
     logout,
     forgotPassword,
     resetPassword,
+    fetchUserDetails,
 };

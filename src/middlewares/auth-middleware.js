@@ -1,12 +1,12 @@
 const { ErrorResponse, Auth } = require("../utils/common");
 const { StatusCodes } = require("http-status-codes");
 const AppError = require("../utils/error/app-error");
-const { AuthService } = require("../services");
 
 async function verifyJWT(req, res, next) {
     try {
         const token =
             req.cookies.token || req.headers["Authorization"]?.split(" ")[1];
+
         if (!token) {
             return res
                 .status(StatusCodes.UNAUTHORIZED)
@@ -21,7 +21,7 @@ async function verifyJWT(req, res, next) {
         }
 
         const decodedData = await Auth.decodeToken(token);
-        if (!decodedData) {
+        if (!decodedData || !decodedData.id) {
             return res
                 .status(StatusCodes.UNAUTHORIZED)
                 .json(
@@ -34,10 +34,7 @@ async function verifyJWT(req, res, next) {
                 );
         }
 
-        const userId = await AuthService.fetchUserByJWTToken({
-            email: decodedData.email,
-        });
-        req.userId = userId;
+        req.userId = decodedData.id;
         next();
     } catch (error) {
         return res

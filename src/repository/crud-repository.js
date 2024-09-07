@@ -12,6 +12,11 @@ class CrudRepository {
         const response = await this.model.findOne(query);
         return response;
     }
+
+    async findById(query) {
+        const response = await this.model.findById(query);
+        return response;
+    }
 }
 
 module.exports = CrudRepository;
