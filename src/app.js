@@ -19,10 +19,8 @@ app.use(limiter);
 app.use(LoggerConfig.logger);
 app.use(
     cors({
-        origin: "*",
+        origin: "http://localhost:5173",
         credentials: true,
-        allowedHeaders: true,
-        methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     })
 );
 
