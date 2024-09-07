@@ -2,7 +2,9 @@ const { StatusCodes } = require("http-status-codes");
 const { ErrorResponse } = require("../utils/common");
 const AppError = require("../utils/error/app-error");
 
+// Validate incoming sign up request
 function validateIncomingSignUpRequest(req, res, next) {
+    // Check if the email is present
     if (!req.body.email) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -13,6 +15,8 @@ function validateIncomingSignUpRequest(req, res, next) {
                 )
             );
     }
+
+    // Check if the user name is present
     if (!req.body.userName) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -26,6 +30,8 @@ function validateIncomingSignUpRequest(req, res, next) {
                 )
             );
     }
+
+    // Check if the password is present
     if (!req.body.password) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -39,10 +45,14 @@ function validateIncomingSignUpRequest(req, res, next) {
                 )
             );
     }
+
+    // Calling the next middleware function
     next();
 }
 
+// Validate incoming sign in request
 function validateIncomingSignInRequest(req, res, next) {
+    // Check if the email is present
     if (!req.body.email) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -53,6 +63,8 @@ function validateIncomingSignInRequest(req, res, next) {
                 )
             );
     }
+
+    // Check if the password is present
     if (!req.body.password) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -66,10 +78,14 @@ function validateIncomingSignInRequest(req, res, next) {
                 )
             );
     }
+
+    // Calling the next middleware function
     next();
 }
 
+// Validate incoming verify email request
 function validateIncomingVerifyEmailRequest(req, res, next) {
+    // Check if the email is present
     if (!req.body.email) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -80,6 +96,8 @@ function validateIncomingVerifyEmailRequest(req, res, next) {
                 )
             );
     }
+
+    // Check if the OTP is present
     if (!req.body.otp) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -90,10 +108,14 @@ function validateIncomingVerifyEmailRequest(req, res, next) {
                 )
             );
     }
+
+    // Calling the next middleware function
     next();
 }
 
+// Validate incoming forgot password request
 function validateIncomingForgotPasswordRequest(req, res, next) {
+    // Check if the email is present
     if (!req.body.email) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -104,10 +126,14 @@ function validateIncomingForgotPasswordRequest(req, res, next) {
                 )
             );
     }
+
+    // Calling the next middleware function
     next();
 }
 
+// Validate incoming reset password request
 function validateIncomingResetPasswordRequest(req, res, next) {
+    // Check if the new password is present
     if (!req.body.newPassword) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -121,6 +147,8 @@ function validateIncomingResetPasswordRequest(req, res, next) {
                 )
             );
     }
+
+    // Check if the confirm new password is present
     if (!req.body.confirmNewPassword) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -134,6 +162,8 @@ function validateIncomingResetPasswordRequest(req, res, next) {
                 )
             );
     }
+
+    // Check if the reset token is present
     if (!req.params.resetToken) {
         return res
             .status(StatusCodes.BAD_REQUEST)
@@ -147,9 +177,12 @@ function validateIncomingResetPasswordRequest(req, res, next) {
                 )
             );
     }
+
+    // Calling the next middleware function
     next();
 }
 
+// Export all validation middleware functions
 module.exports = {
     validateIncomingSignUpRequest,
     validateIncomingSignInRequest,
